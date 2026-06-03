@@ -10,7 +10,7 @@ from flask import (
     url_for,
 )
 
-from crypto_module import (
+from backend.crypto import (
     derive_master_key,
     encrypt_password,
     generate_salt,
@@ -18,7 +18,7 @@ from crypto_module import (
     verify_master_password,
     verify_totp,
 )
-from db import (
+from backend.db import (
     create_credential,
     create_user,
     delete_credential,
@@ -143,7 +143,7 @@ def dashboard():
     for item in credentials:
         plaintext = None
         try:
-            from crypto_module import decrypt_password
+            from backend.crypto import decrypt_password
 
             plaintext = decrypt_password(item["encrypted_password"], item["nonce"], master_key)
         except Exception:

@@ -6,7 +6,7 @@
 
 - `app.py` — tạo Flask app chính và cấu hình ứng dụng
 - `routes.py` — định nghĩa các route, logic xác thực và quản lý credential
-- `crypto_module.py` — xử lý mật mã: PBKDF2 hashing, master key derivation, AES-256-GCM encrypt/decrypt, TOTP
+- `backend/crypto.py` — xử lý mật mã: PBKDF2 hashing, master key derivation, AES-256-GCM encrypt/decrypt, TOTP
 - `db.py` — khởi tạo SQLite và CRUD cho người dùng + vault credentials
 - `requirements.txt` — danh sách thư viện cần cài
 - `README.md` — tài liệu hướng dẫn sử dụng
@@ -57,5 +57,5 @@ http://127.0.0.1:5000
 ## Ghi chú
 
 - Mục đích của project này là demo kiến thức bảo mật: PBKDF2 + salt, AES-GCM, TOTP, và lưu trữ an toàn.
-- Tên file `vault.db` sẽ được tạo tự động khi chạy app lần đầu.
+- Tên file `data/vault.db` sẽ được tạo tự động khi chạy app lần đầu.
 - Trong ứng dụng demo, `master_key` được lưu tạm trong session để tiện giải mã. Nếu triển khai thực tế, cần cải tiến lớp bảo mật hơn.
