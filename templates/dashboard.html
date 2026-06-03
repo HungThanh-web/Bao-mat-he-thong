@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Mini Password Vault</title>
     <link rel="stylesheet" href="/static/style.css" />
+    <script src="{{ url_for('static', filename='script.js') }}?v=2" defer></script>
 </head>
 <body>
     <div class="container wide">
@@ -40,7 +41,14 @@
                 <tr>
                     <td>{{ item.service }}</td>
                     <td>{{ item.account }}</td>
-                    <td class="monospace">{{ item.password }}</td>
+                    <td>
+                        <div class="monospace" data-password="{{ item.password }}" data-hidden="true">{{ '•' * (item.password|length) }}</div>
+                        <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                            <a class="password-strength {{ item.password_strength_class }}" href="{{ url_for('routes.audit_credential', credential_id=item.id) }}">{{ item.password_strength_label }}</a>
+                            <button type="button" class="button tiny secondary btn-copy" data-credential-id="{{ item.id }}">Sao chép</button>
+                            <button type="button" class="button tiny secondary btn-toggle" data-credential-id="{{ item.id }}">Hiện</button>
+                        </div>
+                    </td>
                     <td>{{ item.created_at }}</td>
                     <td>
                         <a class="button tiny" href="{{ url_for('routes.edit_credential_route', credential_id=item.id) }}">Sửa</a>
