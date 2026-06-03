@@ -12,8 +12,8 @@
             <h1>Kho mật khẩu</h1>
             <div class="top-actions">
                 <span>Xin chào, {{ username }}</span>
-                <a class="button small" href="{{ url_for('add_credential_route') }}">Thêm</a>
-                <a class="button small" href="{{ url_for('logout') }}">Đăng xuất</a>
+                <a class="button small" href="{{ url_for('routes.add_credential_route') }}">Thêm</a>
+                <a class="button small" href="{{ url_for('routes.logout') }}">Đăng xuất</a>
             </div>
         </header>
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -43,8 +43,8 @@
                     <td class="monospace">{{ item.password }}</td>
                     <td>{{ item.created_at }}</td>
                     <td>
-                        <a class="button tiny" href="{{ url_for('edit_credential_route', credential_id=item.id) }}">Sửa</a>
-                        <form class="inline-form" action="{{ url_for('delete_credential_route', credential_id=item.id) }}" method="post">
+                        <a class="button tiny" href="{{ url_for('routes.edit_credential_route', credential_id=item.id) }}">Sửa</a>
+                        <form class="inline-form" action="{{ url_for('routes.delete_credential_route', credential_id=item.id) }}" method="post">
                             <button class="button tiny danger" type="submit">Xóa</button>
                         </form>
                     </td>
