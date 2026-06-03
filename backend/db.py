@@ -1,5 +1,6 @@
 import sqlite3
 import urllib.parse
+import os
 from typing import Any, Dict, List, Optional
 
 try:
@@ -89,9 +90,17 @@ def get_connection(path: str):
             "database": cfg["db"],
             "cursorclass": DictCursor,
         }
-        # SSL handling: user can extend this if they have CA file
+        # SSL handling: if ssl-mode=REQUIRED use SSL. If user provides a CA
+        # bundle path via the MYSQL_SSL_CA env var, pass it to PyMySQL so
+        # servers that require a trusted CA (like Aiven) will validate certs.
         if cfg.get("ssl_mode") and cfg["ssl_mode"].upper() == "REQUIRED":
-            conn_args["ssl"] = {}
+            ca_path = os.environ.get("MYSQL_SSL_CA")
+            if ca_path:
+                conn_args["ssl"] = {"ca": ca_path}
+            else:
+                # fall back to enabling SSL without explicit CA (may work
+                # for some hosts but is less strict)
+                conn_args["ssl"] = {}
         conn = pymysql.connect(**conn_args)
         return conn
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% if credential %}Sửa{% else %}Thêm{% endif %} mật khẩu</title>
     <link rel="stylesheet" href="/static/style.css" />
+    <script src="{{ url_for('static', filename='script.js') }}?v=2" defer></script>
 </head>
 <body>
     <div class="container">
@@ -26,7 +27,14 @@
             <input id="account" name="account" required value="{{ credential.account if credential }}" />
 
             <label for="password">Mật khẩu</label>
-            <input id="password" type="password" name="password" required />
+            <div style="display:flex;gap:8px;align-items:center;">
+                <input id="password" type="password" name="password" required style="flex:1;" />
+                <button type="button" id="generatePassword" class="button secondary">Tạo mật khẩu</button>
+            </div>
+            <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+                <div id="passwordStrength" class="password-strength strength-neutral">Chưa có</div>
+                <small id="passwordHint" style="color:#6b7280">Độ mạnh mật khẩu sẽ hiển thị ngay khi bạn gõ.</small>
+            </div>
 
             <button type="submit">Lưu</button>
             <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Hủy</a>

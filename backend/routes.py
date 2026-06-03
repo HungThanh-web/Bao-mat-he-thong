@@ -14,6 +14,7 @@ from backend.crypto import (
     derive_master_key,
     encrypt_password,
     generate_salt,
+    password_strength,
     hash_master_password,
     verify_master_password,
     verify_totp,
@@ -142,18 +143,66 @@ def dashboard():
     master_key = _master_key()
     for item in credentials:
         plaintext = None
+        strength_label = ""
+        strength_class = "strength-neutral"
         try:
             from backend.crypto import decrypt_password
 
             plaintext = decrypt_password(item["encrypted_password"], item["nonce"], master_key)
+            if plaintext:
+                strength_label, strength_class, _ = password_strength(plaintext)
+            else:
+                strength_label = "Không giải mã được"
+                strength_class = "strength-weak"
         except Exception:
             plaintext = "[Không giải mã được]"
+            strength_label = "Không giải mã được"
+            strength_class = "strength-weak"
         decrypted.append({
             **item,
             "password": plaintext or "[Lỗi giải mã]",
+            "password_strength_label": strength_label,
+            "password_strength_class": strength_class,
         })
 
     return render_template("dashboard.html", credentials=decrypted, username=session.get("username"))
+
+
+@routes.route("/audit/<int:credential_id>")
+def audit_credential(credential_id: int):
+    if not _is_logged_in():
+        return redirect(url_for("routes.login"))
+
+    cred = get_credential_by_id(routes.db_path, credential_id)
+    if not cred or cred["user_id"] != session["user_id"]:
+        flash("Không tìm thấy mục này.", "error")
+        return redirect(url_for("routes.dashboard"))
+
+    master_key = _master_key()
+    try:
+        from backend.crypto import decrypt_password
+
+        plaintext = decrypt_password(cred["encrypted_password"], cred["nonce"], master_key)
+    except Exception:
+        plaintext = None
+
+    strength_label, strength_class, details = (None, None, {})
+    duplicates = []
+    if plaintext:
+        strength_label, strength_class, details = password_strength(plaintext)
+        # detect duplicates in user's vault
+        all_creds = get_credentials_for_user(routes.db_path, session["user_id"])
+        for other in all_creds:
+            if other["id"] == credential_id:
+                continue
+            try:
+                other_plain = decrypt_password(other["encrypted_password"], other["nonce"], master_key)
+                if other_plain and other_plain == plaintext:
+                    duplicates.append({"id": other["id"], "service": other["service"], "account": other["account"]})
+            except Exception:
+                pass
+
+    return render_template("audit.html", credential=cred, password=plaintext, strength_label=strength_label, strength_class=strength_class, details=details, duplicates=duplicates)
 
 
 @routes.route("/add", methods=["GET", "POST"])

@@ -86,6 +86,43 @@ def generate_totp_secret() -> str:
     return pyotp.random_base32()
 
 
+def password_strength(password: str) -> tuple[str, str, dict]:
+    """Return (label, css_class, details) for a given plaintext password.
+
+    details includes length and which character classes are present.
+    """
+    if not password:
+        return ("Không có mật khẩu", "strength-neutral", {"length": 0})
+
+    has_lower = any(c.islower() for c in password)
+    has_upper = any(c.isupper() for c in password)
+    has_digit = any(c.isdigit() for c in password)
+    has_sym = any(not c.isalnum() for c in password)
+    length = len(password)
+
+    categories = sum([has_lower, has_upper, has_digit, has_sym])
+
+    if length >= 12 and categories >= 3:
+        label = "Mạnh"
+        css = "strength-strong"
+    elif length >= 8 and categories >= 2:
+        label = "Trung bình"
+        css = "strength-medium"
+    else:
+        label = "Yếu"
+        css = "strength-weak"
+
+    details = {
+        "length": length,
+        "has_lower": has_lower,
+        "has_upper": has_upper,
+        "has_digit": has_digit,
+        "has_sym": has_sym,
+        "categories": categories,
+    }
+    return (label, css, details)
+
+
 def get_totp_uri(username: str, secret: str, issuer_name: str = "MiniPasswordVault") -> str:
     return pyotp.totp.TOTP(secret).provisioning_uri(name=username, issuer_name=issuer_name)
 

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audit - {{ credential.service }} / {{ credential.account }}</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Đánh giá mật khẩu</h1>
+        <p><strong>Dịch vụ:</strong> {{ credential.service }}</p>
+        <p><strong>Tài khoản:</strong> {{ credential.account }}</p>
+        <p><strong>Mật khẩu:</strong> <span class="monospace">{{ password if password else '[Không giải mã được]' }}</span></p>
+        <p><strong>Đánh giá:</strong> <span class="password-strength {{ strength_class }}">{{ strength_label }}</span></p>
+
+        {% if details %}
+        <ul>
+            <li>Độ dài: {{ details.length }}</li>
+            <li>Chữ thường: {{ 'Có' if details.has_lower else 'Không' }}</li>
+            <li>Chữ hoa: {{ 'Có' if details.has_upper else 'Không' }}</li>
+            <li>Chữ số: {{ 'Có' if details.has_digit else 'Không' }}</li>
+            <li>Ký tự đặc biệt: {{ 'Có' if details.has_sym else 'Không' }}</li>
+        </ul>
+        {% endif %}
+
+        {% if duplicates %}
+        <h3>Mật khẩu trùng với:</h3>
+        <ul>
+            {% for d in duplicates %}
+                <li>{{ d.service }} — {{ d.account }} (<a href="{{ url_for('routes.edit_credential_route', credential_id=d.id) }}">mở</a>)</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <a class="button" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+    </div>
+</body>
+</html>
