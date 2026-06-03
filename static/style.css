@@ -1,0 +1,143 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #eef2f7;
+    margin: 0;
+    padding: 0;
+    color: #2f3b4c;
+}
+
+.container {
+    max-width: 520px;
+    margin: 40px auto;
+    padding: 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(18, 35, 76, 0.09);
+}
+
+.container.wide {
+    max-width: 980px;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+h1 {
+    margin: 0 0 18px;
+    font-size: 28px;
+}
+
+label {
+    display: block;
+    margin: 16px 0 8px;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d8dee5;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+button,
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background: #3461ff;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 18px;
+}
+
+button:hover,
+.button:hover {
+    background: #2d57d4;
+}
+
+.button.secondary {
+    background: #f0f4ff;
+    color: #273453;
+    border: 1px solid #d8dee5;
+}
+
+.button.small {
+    padding: 10px 14px;
+    font-size: 13px;
+}
+
+.button.tiny {
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+.button.danger {
+    background: #f3595f;
+}
+
+.flash-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px;
+}
+
+.flash {
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.flash.error {
+    background: #ffe9ea;
+    color: #9f2230;
+}
+
+.flash.success {
+    background: #e8f4e9;
+    color: #19601c;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 14px 12px;
+    border-bottom: 1px solid #e3e8ef;
+    vertical-align: middle;
+}
+
+th {
+    background: #f8fbff;
+    font-weight: 700;
+}
+
+.monospace {
+    font-family: Consolas, 'Courier New', monospace;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.top-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}

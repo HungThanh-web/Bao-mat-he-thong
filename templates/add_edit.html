@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% if credential %}Sửa{% else %}Thêm{% endif %} mật khẩu</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>{% if credential %}Sửa{% else %}Thêm{% endif %} mật khẩu</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-list">
+                {% for category, message in messages %}
+                    <li class="flash {{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        <form method="post">
+            <label for="service">Dịch vụ</label>
+            <input id="service" name="service" required value="{{ credential.service if credential }}" />
+
+            <label for="account">Tài khoản</label>
+            <input id="account" name="account" required value="{{ credential.account if credential }}" />
+
+            <label for="password">Mật khẩu</label>
+            <input id="password" type="password" name="password" required />
+
+            <button type="submit">Lưu</button>
+            <a class="button secondary" href="{{ url_for('dashboard') }}">Hủy</a>
+        </form>
+    </div>
+</body>
+</html>
