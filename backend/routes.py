@@ -68,6 +68,7 @@ def login():
             return render_template("login.html")
 
         master_key = derive_master_key(password, salt)
+        session.permanent = True
         session["user_id"] = user["id"]
         session["username"] = user["username"]
         session["master_key"] = base64.b64encode(master_key).decode("utf-8")
