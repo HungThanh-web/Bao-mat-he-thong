@@ -34,7 +34,7 @@ def create_app() -> Flask:
     app.config['SESSION_PERMANENT'] = False 
     
     # Thiết lập thời gian hết hạn (Session Timeout) sau 5 phút nếu không tương tác
-    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds= 1)
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds= 30)
     
     # Tăng cường bảo mật Cookie, chống các cuộc tấn công Cross-Site Scripting (XSS)
     app.config['SESSION_COOKIE_HTTPONLY'] = True
