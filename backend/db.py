@@ -46,7 +46,20 @@ def get_connection(path: str):
     # Add SSL CA if provided
     ca_path = os.environ.get("MYSQL_SSL_CA")
     if ca_path:
-        conn_args["ssl"] = {"ca": ca_path}
+        # Convert to absolute path if relative
+        if not os.path.isabs(ca_path):
+            # Get project root directory
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+            ca_path = os.path.join(project_root, ca_path)
+        
+        if os.path.exists(ca_path):
+            conn_args["ssl"] = {
+                "ca": ca_path,
+                "check_hostname": False,
+                "verify_cert": False
+            }
+        else:
+            print(f"Warning: SSL CA file not found at {ca_path}")
     
     conn = pymysql.connect(**conn_args)
     return conn

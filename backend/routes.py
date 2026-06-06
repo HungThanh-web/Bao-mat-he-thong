@@ -1,4 +1,5 @@
 import base64
+import time
 
 from flask import (
     Blueprint,
@@ -45,6 +46,27 @@ def _master_key() -> bytes:
     return base64.b64decode(key_b64)
 
 
+def _check_login_rate_limit(username: str) -> tuple[bool, str]:
+    """
+    Kiểm tra rate limit cho login (tối đa 5 lần sai mật khẩu trong 15 phút).
+    Trả về: (is_allowed, message)
+    """
+    rate_limit_key = f"login_attempts_{username}"
+    current_time = time.time()
+    
+    # Lấy danh sách thời gian thất bại
+    attempts = session.get(rate_limit_key, [])
+    
+    # Xóa các thử nghiệm cũ hơn 15 phút (900 giây)
+    attempts = [t for t in attempts if current_time - t < 900]
+    
+    if len(attempts) >= 5:
+        flash(f"⚠️ Quá nhiều lần đăng nhập sai. Vui lòng thử lại sau 15 phút.", "error")
+        return False, "Bạn đã bị khóa tạm thời do đăng nhập thất bại quá nhiều lần."
+    
+    return True, ""
+
+
 @routes.route("/")
 def index():
     if _is_logged_in():
@@ -57,6 +79,12 @@ def login():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
+        
+        # Kiểm tra rate limiting
+        is_allowed, error_msg = _check_login_rate_limit(username)
+        if not is_allowed:
+            return render_template("login.html")
+        
         user = get_user_by_username(routes.db_path, username)
         if not user:
             flash("Tên đăng nhập không tồn tại.", "error")
@@ -64,8 +92,18 @@ def login():
 
         salt = base64.b64decode(user["salt"])
         if not verify_master_password(password, salt, user["password_hash"]):
+            # Ghi lại lần thất bại
+            rate_limit_key = f"login_attempts_{username}"
+            attempts = session.get(rate_limit_key, [])
+            attempts.append(time.time())
+            session[rate_limit_key] = attempts
+            
             flash("Sai mật khẩu chính.", "error")
             return render_template("login.html")
+
+        # Xóa lịch sử thất bại khi đăng nhập thành công
+        rate_limit_key = f"login_attempts_{username}"
+        session.pop(rate_limit_key, None)
 
         master_key = derive_master_key(password, salt)
         session.permanent = True
@@ -95,6 +133,15 @@ def register():
 
         if password != confirm:
             flash("Mật khẩu xác nhận không khớp.", "error")
+            return render_template("register.html")
+
+        # Kiểm tra độ mạnh mật khẩu (bắt buộc đáp ứng chính sách)
+        strength, css_class, details = password_strength(password)
+        if not details.get("meets_policy"):
+            flash(f"Mật khẩu quá yếu. Yêu cầu: ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.", "error")
+            return render_template("register.html")
+        if details.get("is_banned"):
+            flash(f"Mật khẩu '{password}' quá phổ biến. Vui lòng chọn mật khẩu khác.", "error")
             return render_template("register.html")
 
         if get_user_by_username(routes.db_path, username):
@@ -279,4 +326,9 @@ def logout():
 def register_routes(app, db_path: str):
     routes.db_path = db_path
     app.register_blueprint(routes)
-    init_db(db_path)
+    try:
+        init_db(db_path)
+    except Exception as e:
+        print(f"⚠️  WARNING: Failed to initialize database: {str(e)}")
+        print(f"⚠️  App will continue but database operations may fail.")
+        print(f"⚠️  Check your database configuration in .env file")

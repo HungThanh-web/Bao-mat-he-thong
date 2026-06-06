@@ -182,6 +182,45 @@ Hệ thống từ chối 10 mật khẩu phổ biến nhất *(nguồn: NordPass
 
 ---
 
+## 🔒 Cải tiến bảo mật (v1.1.0)
+
+**Các bản vá và tính năng bảo mật mới:**
+
+### 1️⃣ Session Timeout (30 phút)
+- **Vấn đề cũ**: Session timeout là 30 giây → người dùng bị đăng xuất rất nhanh
+- **Giải pháp**: Tăng thành **30 phút** (1800 giây) để trải nghiệm tốt hơn
+- **Cấu hình**: `PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)` trong `backend/__init__.py`
+
+### 2️⃣ Secret Key Generation
+- **Vấn đề cũ**: Secret key mặc định là `'dev-secret-change-me'` → không an toàn
+- **Giải pháp**: 
+  - Nếu `FLASK_SECRET_KEY` không được set trong `.env`, hệ thống sẽ **tự động sinh random key**
+  - Sẽ in ra terminal để người dùng copy vào `.env` cho production
+- **Benefit**: Session cookies được mã hóa bằng key ngẫu nhiên thay vì key cố định
+
+### 3️⃣ Conditional Debug Mode
+- **Vấn đề cũ**: Debug mode luôn bật → debugger expose stack trace trong production
+- **Giải pháp**: 
+  - Debug mode chỉ bật khi `FLASK_ENV=development`
+  - Thêm vào `.env`: `FLASK_ENV=development` (local) hoặc bỏ trống (production)
+- **Benefit**: Tăng cường bảo mật khi deploy
+
+### 4️⃣ Password Strength Validation trên Đăng ký
+- **Vấn đề cũ**: Người dùng có thể đăng ký với mật khẩu "Yếu"
+- **Giải pháp**: 
+  - Bắt buộc mật khẩu phải ít nhất "Trung bình" (8 ký tự, bao gồm chữ hoa, chữ thường, số, ký tự đặc biệt)
+  - Chặn mật khẩu trong danh sách "Top 100 bị cấm"
+- **Benefit**: Tài khoản người dùng được bảo vệ tốt hơn
+
+### 5️⃣ Rate Limiting trên Login
+- **Vấn đề cũ**: Không có bảo vệ brute force → kẻ tấn công có thể thử nhiều mật khẩu
+- **Giải pháp**: 
+  - Giới hạn **tối đa 5 lần đăng nhập sai** trong **15 phút**
+  - Nếu vượt quá, hiển thị cảnh báo và khóa tạm thời
+- **Benefit**: Chống brute force attack, bảo vệ tài khoản người dùng
+
+---
+
 ## 🚧 Tính năng đang phát triển
 
 Một số tính năng hiện đang trong quá trình hoàn thiện — lưu ý để tránh nhầm lẫn khi thử nghiệm:
