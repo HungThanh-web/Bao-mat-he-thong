@@ -148,6 +148,10 @@ def _totp_qr_data_uri(otp_uri: str) -> str | None:
     return f"data:image/png;base64,{encoded}"
 
 
+def _vault_identity_key(service: str, account: str, url: str) -> tuple[str, str, str]:
+    return (service.strip().casefold(), account.strip().casefold(), url.strip().casefold())
+
+
 @routes.route("/")
 def index():
     if _is_logged_in():
@@ -518,11 +522,24 @@ def import_vault():
             envelope = json.loads(upload.read().decode("utf-8"))
             payload = decrypt_export_payload(envelope, passphrase)
             imported = 0
+            skipped_existing = 0
+            skipped_invalid = 0
+            existing_credentials = get_credentials_for_user(routes.db_path, session["user_id"])
+            existing_keys = {
+                _vault_identity_key(cred.get("service") or "", cred.get("account") or "", cred.get("url") or "")
+                for cred in existing_credentials
+            }
             for item in payload.get("items", []):
                 password = item.get("password") or ""
-                service = item.get("service") or ""
-                account = item.get("account") or ""
+                service = (item.get("service") or "").strip()
+                account = (item.get("account") or "").strip()
+                url = (item.get("url") or "").strip()
                 if not service or not account or not password:
+                    skipped_invalid += 1
+                    continue
+                item_key = _vault_identity_key(service, account, url)
+                if item_key in existing_keys:
+                    skipped_existing += 1
                     continue
                 encrypted_password, nonce = encrypt_password(password, _master_key())
                 create_credential(
@@ -530,14 +547,19 @@ def import_vault():
                     session["user_id"],
                     service,
                     account,
-                    item.get("url") or "",
+                    url,
                     item.get("notes") or "",
                     item.get("category") or "Cá nhân",
                     encrypted_password,
                     nonce,
                 )
+                existing_keys.add(item_key)
                 imported += 1
-            flash(f"Đã nhập {imported} mục vào kho mật khẩu.", "success")
+            flash(
+                f"Đã nhập {imported} mục. Bỏ qua {skipped_existing} mục đã tồn tại "
+                f"và {skipped_invalid} mục thiếu dữ liệu.",
+                "success",
+            )
             return redirect(url_for("routes.dashboard"))
         except Exception:
             flash("Không thể giải mã hoặc đọc file import.", "error")

@@ -243,6 +243,7 @@ Khi import:
 2. Nhập passphrase đã dùng khi export.
 3. Hệ thống giải mã file.
 4. Từng credential được mã hóa lại bằng master key của tài khoản hiện tại rồi lưu vào database.
+5. Nếu credential đã tồn tại theo cùng `service + account + URL`, hệ thống bỏ qua để tránh tạo bản trùng trên dashboard.
 
 Ý nghĩa: người dùng có thể sao lưu hoặc chuyển dữ liệu giữa các tài khoản mà không lưu file plaintext.
 
