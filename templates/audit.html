@@ -8,7 +8,14 @@
 </head>
 <body data-authenticated="true" data-lock-seconds="300">
     <main class="container">
-        <h1>Đánh giá mật khẩu</h1>
+        <header>
+            <div>
+                <p class="eyebrow">Password Audit</p>
+                <h1>Đánh giá mật khẩu</h1>
+                <p>Kiểm tra độ mạnh, tuổi mật khẩu, trùng lặp và rò rỉ dữ liệu.</p>
+            </div>
+        </header>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flash-list">
@@ -18,6 +25,7 @@
             </ul>
         {% endif %}
         {% endwith %}
+
         <p><strong>Dịch vụ:</strong> {{ credential.service }}</p>
         <p><strong>Tài khoản:</strong> {{ credential.account }}</p>
         <p><strong>URL:</strong> {{ credential.url or 'Chưa có' }}</p>

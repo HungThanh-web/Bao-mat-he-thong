@@ -8,7 +8,14 @@
 </head>
 <body data-authenticated="true" data-lock-seconds="300">
     <main class="container">
-        <h1>{% if mode == 'export' %}Export{% else %}Import{% endif %} dữ liệu</h1>
+        <header>
+            <div>
+                <p class="eyebrow">Vault Backup</p>
+                <h1>{% if mode == 'export' %}Export{% else %}Import{% endif %} dữ liệu</h1>
+                <p>{% if mode == 'export' %}Tải bản sao lưu đã mã hóa của kho mật khẩu.{% else %}Khôi phục dữ liệu từ file export đã mã hóa.{% endif %}</p>
+            </div>
+        </header>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flash-list">
@@ -23,8 +30,10 @@
             <form method="post">
                 <label for="passphrase">Mật khẩu mã hóa file export</label>
                 <input id="passphrase" name="passphrase" type="password" minlength="8" required />
-                <button type="submit">Tải file mã hóa</button>
-                <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+                <div class="form-actions">
+                    <button type="submit">Tải file mã hóa</button>
+                    <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+                </div>
             </form>
         {% else %}
             <form method="post" enctype="multipart/form-data">
@@ -32,8 +41,10 @@
                 <input id="vault_file" name="vault_file" type="file" accept="application/json,.json" required />
                 <label for="passphrase">Mật khẩu giải mã file import</label>
                 <input id="passphrase" name="passphrase" type="password" required />
-                <button type="submit">Nhập dữ liệu</button>
-                <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+                <div class="form-actions">
+                    <button type="submit">Nhập dữ liệu</button>
+                    <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+                </div>
             </form>
         {% endif %}
     </main>

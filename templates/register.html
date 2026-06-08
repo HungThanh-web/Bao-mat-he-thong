@@ -6,9 +6,12 @@
     <title>Đăng ký - Mini Password Vault</title>
     <link rel="stylesheet" href="/static/style.css" />
 </head>
-<body>
+<body class="auth-page">
     <main class="container">
+        <p class="eyebrow">Tài khoản mới</p>
         <h1>Đăng ký</h1>
+        <p>Tạo Master Password mạnh để bảo vệ toàn bộ kho mật khẩu.</p>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flash-list">
@@ -18,17 +21,20 @@
             </ul>
         {% endif %}
         {% endwith %}
+
         <form method="post">
             <label for="username">Tên đăng nhập</label>
-            <input id="username" name="username" required />
+            <input id="username" name="username" autocomplete="username" required />
 
             <label for="password">Master Password</label>
-            <input id="password" type="password" name="password" required />
+            <input id="password" type="password" name="password" autocomplete="new-password" required />
 
             <label for="confirm">Xác nhận mật khẩu</label>
-            <input id="confirm" type="password" name="confirm" required />
+            <input id="confirm" type="password" name="confirm" autocomplete="new-password" required />
 
-            <button type="submit">Đăng ký</button>
+            <div class="form-actions">
+                <button type="submit">Đăng ký</button>
+            </div>
         </form>
         <p>Đã có tài khoản? <a href="{{ url_for('routes.login') }}">Đăng nhập</a></p>
     </main>

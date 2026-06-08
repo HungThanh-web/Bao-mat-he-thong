@@ -6,9 +6,12 @@
     <title>Xác thực 2FA</title>
     <link rel="stylesheet" href="/static/style.css" />
 </head>
-<body>
+<body class="auth-page">
     <main class="container">
+        <p class="eyebrow">Bảo mật bổ sung</p>
         <h1>Xác thực 2FA</h1>
+        <p>Nhập mã 6 số từ ứng dụng Authenticator để tiếp tục.</p>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flash-list">
@@ -18,10 +21,13 @@
             </ul>
         {% endif %}
         {% endwith %}
+
         <form method="post">
             <label for="token">Mã OTP</label>
             <input id="token" name="token" inputmode="numeric" autocomplete="one-time-code" required />
-            <button type="submit">Xác nhận</button>
+            <div class="form-actions">
+                <button type="submit">Xác nhận</button>
+            </div>
         </form>
     </main>
 </body>

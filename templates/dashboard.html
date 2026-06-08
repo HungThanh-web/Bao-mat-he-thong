@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kho mật khẩu - Mini Password Vault</title>
     <link rel="stylesheet" href="/static/style.css" />
-    <script src="{{ url_for('static', filename='script.js') }}?v=3" defer></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=4" defer></script>
 </head>
 <body data-authenticated="true" data-lock-seconds="300">
     <main class="shell">
         <header class="app-header">
             <div>
+                <p class="eyebrow">Mini Password Vault</p>
                 <h1>Kho mật khẩu</h1>
-                <p>Xin chào, {{ username }}</p>
+                <p>Xin chào, {{ username }}. Quản lý tài khoản, kiểm tra bảo mật và sao lưu dữ liệu tại đây.</p>
             </div>
-            <nav class="top-actions">
+            <nav class="top-actions" aria-label="Thao tác chính">
                 <a class="button small" href="{{ url_for('routes.add_credential_route') }}">Thêm</a>
                 <a class="button small secondary" href="{{ url_for('routes.setup_2fa') }}">2FA</a>
                 <a class="button small secondary" href="{{ url_for('routes.audit_all') }}">Audit</a>
@@ -42,7 +43,7 @@
 
         <form class="filter-bar" method="get">
             <input name="q" placeholder="Tìm theo dịch vụ, tài khoản, URL hoặc ghi chú" value="{{ query }}" />
-            <select name="category">
+            <select name="category" aria-label="Danh mục">
                 <option value="">Tất cả danh mục</option>
                 {% for item in categories %}
                     <option value="{{ item }}" {% if item == selected_category %}selected{% endif %}>{{ item }}</option>

@@ -5,11 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% if credential %}Sửa{% else %}Thêm{% endif %} mật khẩu</title>
     <link rel="stylesheet" href="/static/style.css" />
-    <script src="{{ url_for('static', filename='script.js') }}?v=3" defer></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=4" defer></script>
 </head>
 <body data-authenticated="true" data-lock-seconds="300">
     <main class="container">
-        <h1>{% if credential %}Sửa{% else %}Thêm{% endif %} mật khẩu</h1>
+        <header>
+            <div>
+                <p class="eyebrow">Credential</p>
+                <h1>{% if credential %}Sửa{% else %}Thêm{% endif %} mật khẩu</h1>
+                <p>Lưu thông tin đăng nhập, URL, ghi chú và danh mục cho từng dịch vụ.</p>
+            </div>
+        </header>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flash-list">
@@ -19,6 +26,7 @@
             </ul>
         {% endif %}
         {% endwith %}
+
         <form method="post">
             <label for="service">Tên ứng dụng / Website</label>
             <input id="service" name="service" required value="{{ credential.service if credential else '' }}" />
