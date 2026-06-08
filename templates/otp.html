@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-    <div class="container">
+    <main class="container">
         <h1>Xác thực 2FA</h1>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -20,9 +20,9 @@
         {% endwith %}
         <form method="post">
             <label for="token">Mã OTP</label>
-            <input id="token" name="token" required />
+            <input id="token" name="token" inputmode="numeric" autocomplete="one-time-code" required />
             <button type="submit">Xác nhận</button>
         </form>
-    </div>
+    </main>
 </body>
 </html>

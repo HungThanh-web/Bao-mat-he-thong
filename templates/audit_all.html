@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audit toàn kho</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body data-authenticated="true" data-lock-seconds="300">
+    <main class="shell">
+        <header class="app-header">
+            <div>
+                <h1>Audit toàn kho</h1>
+                <p>Phát hiện mật khẩu yếu, trùng lặp và quá cũ.</p>
+            </div>
+            <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+        </header>
+
+        <section class="audit-strip">
+            <div><strong>{{ audit_totals.weak }}</strong><span>mật khẩu yếu</span></div>
+            <div><strong>{{ audit_totals.duplicate }}</strong><span>bị trùng</span></div>
+            <div><strong>{{ audit_totals.old }}</strong><span>quá 180 ngày</span></div>
+        </section>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dịch vụ</th>
+                        <th>Tài khoản</th>
+                        <th>Độ mạnh</th>
+                        <th>Tuổi</th>
+                        <th>Cảnh báo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in credentials %}
+                    <tr>
+                        <td>{{ item.service }}</td>
+                        <td>{{ item.account }}</td>
+                        <td><span class="password-strength {{ item.password_strength_class }}">{{ item.password_strength_label }}</span></td>
+                        <td>{{ item.password_age_days if item.password_age_days is not none else 'Không rõ' }} ngày</td>
+                        <td>
+                            {% if item.is_duplicate %}<span class="pill warning">Trùng</span>{% endif %}
+                            {% if item.password_age_days is not none and item.password_age_days >= 180 %}<span class="pill warning">Cũ</span>{% endif %}
+                        </td>
+                        <td><a class="button tiny" href="{{ url_for('routes.audit_credential', credential_id=item.id) }}">Chi tiết</a></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6">Chưa có dữ liệu để audit.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

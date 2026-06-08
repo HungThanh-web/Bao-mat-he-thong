@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-    <div class="container">
+    <main class="container">
         <h1>Đăng ký</h1>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -31,6 +31,6 @@
             <button type="submit">Đăng ký</button>
         </form>
         <p>Đã có tài khoản? <a href="{{ url_for('routes.login') }}">Đăng nhập</a></p>
-    </div>
+    </main>
 </body>
 </html>

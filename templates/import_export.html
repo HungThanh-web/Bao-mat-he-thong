@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% if mode == 'export' %}Export{% else %}Import{% endif %} dữ liệu</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body data-authenticated="true" data-lock-seconds="300">
+    <main class="container">
+        <h1>{% if mode == 'export' %}Export{% else %}Import{% endif %} dữ liệu</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-list">
+                {% for category, message in messages %}
+                    <li class="flash {{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+
+        {% if mode == 'export' %}
+            <form method="post">
+                <label for="passphrase">Mật khẩu mã hóa file export</label>
+                <input id="passphrase" name="passphrase" type="password" minlength="8" required />
+                <button type="submit">Tải file mã hóa</button>
+                <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+            </form>
+        {% else %}
+            <form method="post" enctype="multipart/form-data">
+                <label for="vault_file">File .enc.json</label>
+                <input id="vault_file" name="vault_file" type="file" accept="application/json,.json" required />
+                <label for="passphrase">Mật khẩu giải mã file import</label>
+                <input id="passphrase" name="passphrase" type="password" required />
+                <button type="submit">Nhập dữ liệu</button>
+                <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+            </form>
+        {% endif %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thiết lập 2FA</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body data-authenticated="true" data-lock-seconds="300">
+    <main class="container">
+        <h1>Xác thực 2 yếu tố</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-list">
+                {% for category, message in messages %}
+                    <li class="flash {{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+
+        {% if enabled %}
+            <p>2FA đang bật cho tài khoản này.</p>
+            <form method="post">
+                <input type="hidden" name="action" value="disable" />
+                <button type="submit" class="danger">Tắt 2FA</button>
+                <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Quay lại</a>
+            </form>
+        {% else %}
+            <p>Nhập secret hoặc URI bên dưới vào Google Authenticator, Authy hoặc ứng dụng TOTP tương thích.</p>
+            <label>Secret</label>
+            <div class="copy-box monospace">{{ secret }}</div>
+            <label>OTP URI</label>
+            <div class="copy-box monospace">{{ otp_uri }}</div>
+            <form method="post">
+                <label for="token">Mã OTP 6 số</label>
+                <input id="token" name="token" inputmode="numeric" autocomplete="one-time-code" required />
+                <button type="submit">Bật 2FA</button>
+                <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Hủy</a>
+            </form>
+        {% endif %}
+    </main>
+</body>
+</html>

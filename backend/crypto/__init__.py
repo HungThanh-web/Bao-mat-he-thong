@@ -23,6 +23,10 @@ from backend.crypto.totp import (
 from backend.crypto.strength import (
     password_strength,
 )
+from backend.crypto.exporting import (
+    decrypt_export_payload,
+    encrypt_export_payload,
+)
 
 __all__ = [
     # Hashing
@@ -39,6 +43,8 @@ __all__ = [
     "verify_totp",
     # Strength
     "password_strength",
+    "decrypt_export_payload",
+    "encrypt_export_payload",
     # Constants
     "SALT_SIZE",
     "KEY_LENGTH",

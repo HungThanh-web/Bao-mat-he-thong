@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% if credential %}Sửa{% else %}Thêm{% endif %} mật khẩu</title>
     <link rel="stylesheet" href="/static/style.css" />
-    <script src="{{ url_for('static', filename='script.js') }}?v=2" defer></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=3" defer></script>
 </head>
-<body>
-    <div class="container">
+<body data-authenticated="true" data-lock-seconds="300">
+    <main class="container">
         <h1>{% if credential %}Sửa{% else %}Thêm{% endif %} mật khẩu</h1>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -20,25 +20,49 @@
         {% endif %}
         {% endwith %}
         <form method="post">
-            <label for="service">Dịch vụ</label>
-            <input id="service" name="service" required value="{{ credential.service if credential }}" />
+            <label for="service">Tên ứng dụng / Website</label>
+            <input id="service" name="service" required value="{{ credential.service if credential else '' }}" />
 
-            <label for="account">Tài khoản</label>
-            <input id="account" name="account" required value="{{ credential.account if credential }}" />
+            <label for="account">Tên đăng nhập</label>
+            <input id="account" name="account" required value="{{ credential.account if credential else '' }}" />
+
+            <label for="url">URL website</label>
+            <input id="url" name="url" type="url" placeholder="https://example.com" value="{{ credential.url if credential else '' }}" />
+
+            <label for="category">Danh mục</label>
+            <input id="category" name="category" list="categorySuggestions" value="{{ credential.category if credential else 'Cá nhân' }}" />
+            <datalist id="categorySuggestions">
+                <option value="Cá nhân"></option>
+                <option value="Công việc"></option>
+                <option value="Tài chính"></option>
+                <option value="Mạng xã hội"></option>
+            </datalist>
 
             <label for="password">Mật khẩu</label>
-            <div style="display:flex;gap:8px;align-items:center;">
-                <input id="password" type="password" name="password" required style="flex:1;" />
-                <button type="button" id="generatePassword" class="button secondary">Tạo mật khẩu</button>
+            <div class="input-row">
+                <input id="password" type="password" name="password" required value="{{ credential.password if credential else '' }}" />
+                <button type="button" id="generatePassword" class="button secondary">Tạo</button>
             </div>
-            <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+            <div class="generator-options">
+                <label><span>Dài</span><input id="passwordLength" type="number" min="8" max="64" value="20" /></label>
+                <label><input id="useUpper" type="checkbox" checked /> Chữ hoa</label>
+                <label><input id="useLower" type="checkbox" checked /> Chữ thường</label>
+                <label><input id="useDigits" type="checkbox" checked /> Số</label>
+                <label><input id="useSymbols" type="checkbox" checked /> Ký tự đặc biệt</label>
+            </div>
+            <div class="strength-row">
                 <div id="passwordStrength" class="password-strength strength-neutral">Chưa có</div>
-                <small id="passwordHint" style="color:#6b7280">Độ mạnh mật khẩu sẽ hiển thị ngay khi bạn gõ.</small>
+                <small id="passwordHint">Độ mạnh cập nhật khi bạn nhập.</small>
             </div>
 
-            <button type="submit">Lưu</button>
-            <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Hủy</a>
+            <label for="notes">Ghi chú</label>
+            <textarea id="notes" name="notes" rows="4">{{ credential.notes if credential else '' }}</textarea>
+
+            <div class="form-actions">
+                <button type="submit">Lưu</button>
+                <a class="button secondary" href="{{ url_for('routes.dashboard') }}">Hủy</a>
+            </div>
         </form>
-    </div>
+    </main>
 </body>
 </html>

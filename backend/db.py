@@ -18,12 +18,26 @@ DB_SCHEMA_MYSQL = [
     "user_id INT NOT NULL, "
     "service VARCHAR(255) NOT NULL, "
     "account VARCHAR(255) NOT NULL, "
+    "url TEXT, "
+    "notes TEXT, "
+    "category VARCHAR(120) DEFAULT 'Cá nhân', "
     "encrypted_password TEXT NOT NULL, "
     "nonce TEXT NOT NULL, "
     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+    "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
     "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
     ") ENGINE=InnoDB",
 ]
+
+VAULT_COLUMN_MIGRATIONS = {
+    "url": "ALTER TABLE vault_credentials ADD COLUMN url TEXT",
+    "notes": "ALTER TABLE vault_credentials ADD COLUMN notes TEXT",
+    "category": "ALTER TABLE vault_credentials ADD COLUMN category VARCHAR(120) DEFAULT 'Cá nhân'",
+    "updated_at": (
+        "ALTER TABLE vault_credentials ADD COLUMN updated_at "
+        "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    ),
+}
 
 
 def get_connection(path: str):
@@ -59,6 +73,11 @@ def init_db(path: str) -> None:
         with conn.cursor() as cur:
             for stmt in DB_SCHEMA_MYSQL:
                 cur.execute(stmt)
+            cur.execute("SHOW COLUMNS FROM vault_credentials")
+            existing_columns = {row["Field"] for row in cur.fetchall()}
+            for column, stmt in VAULT_COLUMN_MIGRATIONS.items():
+                if column not in existing_columns:
+                    cur.execute(stmt)
         conn.commit()
     finally:
         conn.close()
@@ -98,7 +117,7 @@ def get_user_by_id(path: str, user_id: int) -> Optional[Dict[str, Any]]:
         conn.close()
 
 
-def update_user_totp(path: str, user_id: int, totp_secret: str) -> None:
+def update_user_totp(path: str, user_id: int, totp_secret: Optional[str]) -> None:
     conn = get_connection(path)
     try:
         with conn.cursor() as cur:
@@ -113,6 +132,9 @@ def create_credential(
     user_id: int,
     service: str,
     account: str,
+    url: str,
+    notes: str,
+    category: str,
     encrypted_password: str,
     nonce: str,
 ) -> int:
@@ -120,8 +142,10 @@ def create_credential(
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO vault_credentials (user_id, service, account, encrypted_password, nonce) VALUES (%s, %s, %s, %s, %s)",
-                (user_id, service, account, encrypted_password, nonce),
+                "INSERT INTO vault_credentials "
+                "(user_id, service, account, url, notes, category, encrypted_password, nonce) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (user_id, service, account, url, notes, category, encrypted_password, nonce),
             )
             conn.commit()
             return cur.lastrowid
@@ -142,6 +166,21 @@ def get_credentials_for_user(path: str, user_id: int) -> List[Dict[str, Any]]:
         conn.close()
 
 
+def get_categories_for_user(path: str, user_id: int) -> List[str]:
+    conn = get_connection(path)
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT DISTINCT category FROM vault_credentials "
+                "WHERE user_id = %s AND category IS NOT NULL AND category <> '' "
+                "ORDER BY category",
+                (user_id,),
+            )
+            return [row["category"] for row in cur.fetchall()]
+    finally:
+        conn.close()
+
+
 def get_credential_by_id(path: str, credential_id: int) -> Optional[Dict[str, Any]]:
     conn = get_connection(path)
     try:
@@ -157,6 +196,9 @@ def update_credential(
     credential_id: int,
     service: str,
     account: str,
+    url: str,
+    notes: str,
+    category: str,
     encrypted_password: str,
     nonce: str,
 ) -> None:
@@ -164,8 +206,10 @@ def update_credential(
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE vault_credentials SET service = %s, account = %s, encrypted_password = %s, nonce = %s WHERE id = %s",
-                (service, account, encrypted_password, nonce, credential_id),
+                "UPDATE vault_credentials SET service = %s, account = %s, url = %s, "
+                "notes = %s, category = %s, encrypted_password = %s, nonce = %s "
+                "WHERE id = %s",
+                (service, account, url, notes, category, encrypted_password, nonce, credential_id),
             )
             conn.commit()
     finally:
