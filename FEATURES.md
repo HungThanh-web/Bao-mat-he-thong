@@ -6,7 +6,7 @@
 - Mã hóa mật khẩu vault bằng AES-256-GCM trước khi lưu database.
 - CRUD credential với tên dịch vụ, tài khoản, mật khẩu, URL, ghi chú và danh mục.
 - Password generator có tùy chọn độ dài, chữ hoa, chữ thường, số và ký tự đặc biệt.
-- TOTP 2FA: bật, xác minh khi đăng nhập và tắt 2FA.
+- TOTP 2FA: bật bằng QR code hoặc secret, xác minh khi đăng nhập và tắt 2FA.
 - Auto-lock: trình duyệt tự chuyển tới logout sau thời gian không hoạt động, session server hết hạn sau 5 phút.
 - Clipboard protection: sau khi copy mật khẩu, ứng dụng cố gắng xóa clipboard sau 60 giây.
 - Tìm kiếm và lọc theo danh mục.

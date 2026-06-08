@@ -10,6 +10,7 @@ Mini Password Vault là ứng dụng Flask dùng để quản lý mật khẩu c
 | MySQL / PyMySQL | Lưu người dùng và dữ liệu vault đã mã hóa |
 | cryptography | PBKDF2-HMAC-SHA256 và AES-256-GCM |
 | pyotp | Sinh và xác minh mã TOTP cho 2FA |
+| qrcode | Tạo ảnh QR code để thiết lập 2FA nhanh bằng Authenticator |
 | python-dotenv | Đọc cấu hình từ file `.env` |
 | JavaScript | Password generator, copy clipboard, auto-lock phía trình duyệt |
 
@@ -146,11 +147,12 @@ Generator dùng `crypto.getRandomValues` trên trình duyệt để tạo số n
 Luồng bật 2FA:
 
 1. Người dùng vào trang `2FA`.
-2. Hệ thống tạo TOTP secret.
-3. Người dùng nhập secret hoặc OTP URI vào ứng dụng Authenticator.
-4. Ứng dụng Authenticator sinh mã OTP 6 số.
-5. Người dùng nhập mã OTP vào web để xác nhận.
-6. Nếu mã đúng, hệ thống lưu TOTP secret cho tài khoản.
+2. Hệ thống tạo TOTP secret và QR code.
+3. Người dùng quét QR code bằng ứng dụng Authenticator.
+4. Nếu không quét được QR, người dùng có thể nhập secret hoặc OTP URI thủ công.
+5. Ứng dụng Authenticator sinh mã OTP 6 số.
+6. Người dùng nhập mã OTP vào web để xác nhận.
+7. Nếu mã đúng, hệ thống lưu TOTP secret cho tài khoản.
 
 Luồng đăng nhập khi đã bật 2FA:
 
@@ -384,7 +386,6 @@ Một số chức năng trong danh sách mục tiêu cần nền tảng hoặc k
 | Đăng nhập sinh trắc học | Chưa có | Cần WebAuthn/passkey hoặc ứng dụng mobile/native |
 | Chống chụp màn hình tuyệt đối | Chưa có | Web browser không có quyền chặn screenshot ở mức hệ điều hành |
 | OTP qua email/SMS | Chưa có | Cần hạ tầng gửi email/SMS và kiểm soát abuse |
-| QR code cho TOTP | Chưa có | Hiện README và UI cung cấp secret/OTP URI; có thể thêm thư viện QR ở bước sau |
 
 ## Ghi chú về zero-knowledge
 

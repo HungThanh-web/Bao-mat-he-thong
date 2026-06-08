@@ -444,6 +444,22 @@ td small {
     word-break: break-all;
 }
 
+.qr-panel {
+    display: grid;
+    place-items: center;
+    margin: 8px 0 18px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.qr-panel img {
+    width: min(260px, 100%);
+    height: auto;
+    image-rendering: pixelated;
+}
+
 .check-list {
     padding-left: 20px;
     line-height: 1.8;

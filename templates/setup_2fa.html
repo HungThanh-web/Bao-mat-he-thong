@@ -12,7 +12,7 @@
             <div>
                 <p class="eyebrow">Two-Factor Authentication</p>
                 <h1>Xác thực 2 yếu tố</h1>
-                <p>Thêm mã OTP từ ứng dụng Authenticator sau bước nhập Master Password.</p>
+                <p>Quét mã QR bằng Google Authenticator, Authy hoặc ứng dụng TOTP tương thích.</p>
             </div>
         </header>
 
@@ -36,11 +36,19 @@
                 </div>
             </form>
         {% else %}
-            <p>Nhập secret hoặc URI bên dưới vào Google Authenticator, Authy hoặc ứng dụng TOTP tương thích.</p>
+            {% if qr_data_uri %}
+                <div class="qr-panel">
+                    <img src="{{ qr_data_uri }}" alt="Mã QR thiết lập 2FA" />
+                </div>
+            {% else %}
+                <div class="flash error">Chưa tạo được QR code. Hãy cài dependency bằng lệnh <span class="monospace">python -m pip install -r requirements.txt</span>.</div>
+            {% endif %}
+
             <label>Secret</label>
             <div class="copy-box monospace">{{ secret }}</div>
             <label>OTP URI</label>
             <div class="copy-box monospace">{{ otp_uri }}</div>
+
             <form method="post">
                 <label for="token">Mã OTP 6 số</label>
                 <input id="token" name="token" inputmode="numeric" autocomplete="one-time-code" required />

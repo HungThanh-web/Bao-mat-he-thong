@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import io
 import json
 import urllib.request
 from datetime import datetime, timezone
@@ -134,6 +135,19 @@ def _build_audit(credentials: list[dict]) -> tuple[list[dict], dict]:
     return decrypted, totals
 
 
+def _totp_qr_data_uri(otp_uri: str) -> str | None:
+    try:
+        import qrcode
+    except ImportError:
+        return None
+
+    image = qrcode.make(otp_uri)
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
+
+
 @routes.route("/")
 def index():
     if _is_logged_in():
@@ -245,11 +259,13 @@ def setup_2fa():
         session["pending_totp_secret"] = generate_totp_secret()
 
     secret = session["pending_totp_secret"]
+    otp_uri = get_totp_uri(session["username"], secret)
     return render_template(
         "setup_2fa.html",
         enabled=bool(user.get("totp_secret")),
         secret=secret,
-        otp_uri=get_totp_uri(session["username"], secret),
+        otp_uri=otp_uri,
+        qr_data_uri=_totp_qr_data_uri(otp_uri),
     )
 
 
